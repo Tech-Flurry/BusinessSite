@@ -27,4 +27,12 @@
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\muhammadumair.tahir\source\repos\BusinessSite\TechFlurry.BusinessSite.App\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\muhammadumair.tahir\source\repos\BusinessSite\TechFlurry.BusinessSite.App\.editorconfig" />
+  </ItemGroup>
+
 </Project>

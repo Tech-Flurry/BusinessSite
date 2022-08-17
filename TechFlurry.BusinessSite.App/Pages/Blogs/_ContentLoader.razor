@@ -1,0 +1,18 @@
+﻿@typeparam T
+@typeparam U
+
+@if (Model is null)
+{
+    <_ContentLoadingAnimation></_ContentLoadingAnimation>
+}
+else
+{
+    @Content(Model)
+}
+
+@code {
+    [Parameter]
+    public T Model { get; set; }
+    [Parameter]
+    public Func<T, U> Content { get; set; }
+}
