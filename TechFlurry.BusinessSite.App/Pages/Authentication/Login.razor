@@ -1,0 +1,43 @@
+﻿@page "/Authentication/Login"
+@using Microsoft.AspNetCore.Components.Authorization
+@using TechFlurry.BusinessSite.App.Authentication
+@using System.Security.Claims
+@inject NavigationManager Navigator
+@inject IAuthenticationService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+
+
+@code {
+    string token;
+    bool isAuthenticated;
+}
+
+@functions {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChange;
+        var url = Navigator.Uri;
+        var urlChunks = url.Split("=");
+        if (urlChunks.Length > 1)
+        {
+            token = urlChunks[1];
+        }
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (!string.IsNullOrEmpty(token))
+        {
+            isAuthenticated = await AuthService.Login(token);
+        }
+    }
+    async void OnAuthStateChange(Task<AuthenticationState> authenticationState)
+    {
+        var authState = await authenticationState;
+        if (authState?.User?.Identity?.IsAuthenticated ?? false)
+        {
+            Navigator.NavigateTo("/");
+        }
+    }
+}
