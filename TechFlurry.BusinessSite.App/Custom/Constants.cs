@@ -11,5 +11,6 @@
         public const string POSTAL_ADDRESS = "235-A, D Block, Edenabad, Lahore, Pakistan";
         public const string TOKEN_NAME = "auth-token";
         public const string AUTH_TYPE = "jwtAuthType";
+        public const string RETURN_URL = "retUrl";
     }
 }

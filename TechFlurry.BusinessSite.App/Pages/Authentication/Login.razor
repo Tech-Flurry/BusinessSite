@@ -1,10 +1,12 @@
 ﻿@page "/Authentication/Login"
+@using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Components.Authorization
 @using TechFlurry.BusinessSite.App.Authentication
 @using System.Security.Claims
 @inject NavigationManager Navigator
 @inject IAuthenticationService AuthService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorageService
 
 
 @code {
@@ -18,10 +20,13 @@
         base.OnInitialized();
         AuthStateProvider.AuthenticationStateChanged += OnAuthStateChange;
         var url = Navigator.Uri;
-        var urlChunks = url.Split("=");
-        if (urlChunks.Length > 1)
+        if (url.ToLower().Contains("#id_token"))
         {
-            token = urlChunks[1];
+            var urlChunks = url.Split("=");
+            if (urlChunks.Length > 1)
+            {
+                token = urlChunks[1];
+            }
         }
     }
     protected async override Task OnInitializedAsync()
@@ -37,7 +42,10 @@
         var authState = await authenticationState;
         if (authState?.User?.Identity?.IsAuthenticated ?? false)
         {
-            Navigator.NavigateTo("/");
+            StateHasChanged();
+            var returnUrl = await LocalStorageService.GetItemAsync<string>(Constants.RETURN_URL);
+            Navigator.NavigateTo(returnUrl);
+            await LocalStorageService.RemoveItemAsync(Constants.RETURN_URL);
         }
     }
 }

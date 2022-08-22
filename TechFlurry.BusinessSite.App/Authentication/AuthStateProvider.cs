@@ -9,12 +9,12 @@ namespace TechFlurry.BusinessSite.App.Authentication
     {
         private readonly ILocalStorageService _localStorage;
         private readonly AuthenticationState _anonymous;
-        private readonly HttpClient _httpClient;
+        private readonly AuthenticationOptions _options;
 
-        public AuthStateProvider( ILocalStorageService localStorage, HttpClient httpClient )
+        public AuthStateProvider( ILocalStorageService localStorage, AuthenticationOptions options )
         {
             _localStorage = localStorage;
-            _httpClient = httpClient;
+            _options = options;
             _anonymous = new AuthenticationState(new ClaimsPrincipal());
         }
 
@@ -43,28 +43,37 @@ namespace TechFlurry.BusinessSite.App.Authentication
             NotifyAuthenticationStateChanged(authState);
         }
 
-        internal static ClaimsPrincipal GetAuthenticatedUser( string token )
+        internal ClaimsPrincipal GetAuthenticatedUser( string token )
         {
             var claims = JwtParser.ParseClaimsFromJwt(token);
             var utcNow = DateTime.UtcNow;
-            // Checks the nbf field of the token
-            var notValidBefore = claims.Where(x => x.Type.Equals("nbf")).FirstOrDefault();
-            if (notValidBefore is not null)
+            var audience = claims?.GetAppId();
+            //Checks the authentication registered app
+            if (audience == _options.AppId)
             {
-                DateTimeOffset datetime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(notValidBefore.Value));
-                if (datetime.UtcDateTime > utcNow)
-                    return new ClaimsPrincipal();
+                // Checks the nbf field of the token
+                var notValidBefore = claims?.Where(x => x.Type.Equals("nbf")).FirstOrDefault();
+                if (notValidBefore is not null)
+                {
+                    DateTimeOffset datetime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(notValidBefore.Value));
+                    if (datetime.UtcDateTime > utcNow)
+                        return new ClaimsPrincipal();
+                }
+                // Checks the exp field of the token
+                var expiry = claims?.Where(claim => claim.Type.Equals("exp")).FirstOrDefault();
+                if (expiry is not null)
+                {
+                    // The exp field is in Unix time
+                    DateTimeOffset datetime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiry.Value));
+                    if (datetime.UtcDateTime <= utcNow)
+                        return new ClaimsPrincipal();
+                }
+                return new ClaimsPrincipal(new ClaimsIdentity(claims, Constants.AUTH_TYPE));
             }
-            // Checks the exp field of the token
-            var expiry = claims.Where(claim => claim.Type.Equals("exp")).FirstOrDefault();
-            if (expiry is not null)
+            else
             {
-                // The exp field is in Unix time
-                DateTimeOffset datetime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiry.Value));
-                if (datetime.UtcDateTime <= utcNow)
-                    return new ClaimsPrincipal();
+                return new ClaimsPrincipal();
             }
-            return new ClaimsPrincipal(new ClaimsIdentity(claims, Constants.AUTH_TYPE));
         }
     }
 }

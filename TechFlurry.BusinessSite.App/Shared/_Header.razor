@@ -1,4 +1,11 @@
-﻿
+﻿@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@using TechFlurry.BusinessSite.App.Authentication
+@inject IAuthenticationService AuthService
+@inject AuthenticationOptions AuthOptions
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager Navigator
 
 <header id="header" class="full-header header-size-sm">
     <div id="header-wrap">
@@ -39,6 +46,32 @@
                         <li class="menu-item">
                             <a class="menu-link" href="/Blogs"><div>Blog</div><span>Latest Articles</span></a>
                         </li>
+                        <AuthorizeView>
+                            <NotAuthorized>
+                                <li class="menu-item">
+                                    <a class="menu-link" href="javascript:void()" @onclick="OnLoginClicked"><div>Login</div><span>Login to your Account</span></a>
+                                </li>
+                            </NotAuthorized>
+                            <Authorized>
+                                @{
+                                    var name = context?.User?.Claims.FirstOrDefault(x => x.Type.ToLower() == "name")?.Value.Split()?.FirstOrDefault();
+                                }
+                                <li class="menu-item">
+                                    <a class="menu-link" href="javascript:void()"><div>@name</div><span></span></a>
+                                    <ul class="sub-menu-container">
+                                        <li class="menu-item">
+                                            <a class="menu-link" href="javascript:void()" @onclick="OnProfileClicked"><div><i class="icon-line-head"></i>Update Profile</div></a>
+                                        </li>
+                                        <li class="menu-item">
+                                            <a class="menu-link" href="javascript:void()" @onclick="OnResetClicked"><div><i class="icon-key1"></i>Reset Password</div></a>
+                                        </li>
+                                        <li class="menu-item">
+                                            <a class="menu-link" href="javascript:void()" @onclick="e=>{AuthService.Logout();}"><div><i class="icon-line2-logout"></i>Logout</div></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </Authorized>
+                        </AuthorizeView>
                     </ul>
 
                 </nav>
@@ -47,7 +80,41 @@
         </div>
     </div>
     <div class="header-wrap-clone"></div>
-</header><!-- #header end -->
+</header>
 @code {
+    private AuthorizeView? _authorizeView;
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChange;
+    }
+}
+
+@functions {
+    private async void SaveReturnUrl()
+    {
+        var currentUri = Navigator.Uri.Replace(Navigator.BaseUri, "/");
+        await LocalStorageService.SetItemAsync(Constants.RETURN_URL, currentUri);
+    }
+    async void OnAuthStateChange(Task<AuthenticationState> authenticationState)
+    {
+        var authState = await authenticationState;
+        StateHasChanged();
+    }
+    private void OnLoginClicked()
+    {
+        SaveReturnUrl();
+        Navigator.NavigateTo($"https://techflurryltd.b2clogin.com/techflurryltd.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_signup_signin&client_id={AuthOptions.AppId}&nonce=defaultNonce&redirect_uri=https%3A%2F%2Flocalhost%3A7032%2FAuthentication%2FLogin&scope=openid&response_type=id_token&prompt=login");
+    }
+    private void OnProfileClicked()
+    {
+        SaveReturnUrl();
+        Navigator.NavigateTo($"https://techflurryltd.b2clogin.com/techflurryltd.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_Profile_update&client_id={AuthOptions.AppId}&nonce=defaultNonce&redirect_uri=https%3A%2F%2Flocalhost%3A7032%2FAuthentication%2FLogin&scope=openid&response_type=id_token&prompt=login");
+    }
+    private void OnResetClicked()
+    {
+        SaveReturnUrl();
+        Navigator.NavigateTo($"https://techflurryltd.b2clogin.com/techflurryltd.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_Password_Reset&client_id={AuthOptions.AppId}&nonce=defaultNonce&redirect_uri=https%3A%2F%2Flocalhost%3A7032%2FAuthentication%2FLogin&scope=openid&response_type=id_token&prompt=login");
+    }
 }
