@@ -1,5 +1,6 @@
 ﻿@page "/Blogs/Blog/{Identifier}"
 @using TechFlurry.BusinessSite.Models
+@using Microsoft.AspNetCore.Components.Authorization
 
 <section id="page-title">
     <div class="container clearfix">
@@ -29,7 +30,9 @@
                     ============================================= -->
                     <div class="entry-title">
                         <h2><_ContentLoader Model="_model" Content="x=>x.Heading" /></h2>
-
+                        <AuthorizeView Roles="Office apps administrator">
+                            <button class="btn btn-icon"><i class="icon-line-edit" ></i></button>
+                        </AuthorizeView>
                     </div><!-- .entry-title end -->
                     <!-- Entry Meta
                     ============================================= -->
@@ -159,21 +162,26 @@
 
                     <div class="clear"></div>
                     <div id="respond">
-
                         <h3>Leave a <span>Comment</span></h3>
+                        <AuthorizeView>
+                            <Authorized>
+                                <form class="row" action="#" method="post" id="commentform">
 
-                        <form class="row" action="#" method="post" id="commentform">
+                                    <div class="col-12 form-group">
+                                        <label for="comment">Comment</label>
+                                        <textarea name="comment" cols="58" rows="7" tabindex="4" class="sm-form-control"></textarea>
+                                    </div>
 
-                            <div class="col-12 form-group">
-                                <label for="comment">Comment</label>
-                                <textarea name="comment" cols="58" rows="7" tabindex="4" class="sm-form-control"></textarea>
-                            </div>
+                                    <div class="col-12 form-group">
+                                        <button name="submit" type="submit" id="submit-button" tabindex="5" value="Submit" class="button button-3d m-0">Submit Comment</button>
+                                    </div>
+                                </form>
 
-                            <div class="col-12 form-group">
-                                <button name="submit" type="submit" id="submit-button" tabindex="5" value="Submit" class="button button-3d m-0">Submit Comment</button>
-                            </div>
-                        </form>
-
+                            </Authorized>
+                            <NotAuthorized>
+                                <p>Please login to comment!!!</p>
+                            </NotAuthorized>
+                        </AuthorizeView>
                     </div>
 
                 </div>

@@ -19,6 +19,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.8" />
+    <PackageReference Include="Microsoft.Graph" Version="4.37.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using System.Text;
 using TechFlurry.BusinessSite.App;
 using TechFlurry.BusinessSite.App.Authentication;
 using TechFlurry.BusinessSite.App.Interops;
@@ -28,9 +29,18 @@ else
         AppId = "e936bb96-7260-4c11-a827-59c50958d3be"
     });
 }
+
+builder.Services.AddMsalAuthentication(options =>
+{
+    options.ProviderOptions.DefaultAccessTokenScopes.Add("openid");
+    options.ProviderOptions.DefaultAccessTokenScopes.Add("offline_access");
+    options.ProviderOptions.LoginMode = "redirect";
+    
+    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+});
+
+
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IFirebaseInterop, FirebaseInterop>();
 
