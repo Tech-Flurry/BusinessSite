@@ -39,6 +39,12 @@ builder.Services.AddMsalAuthentication(options =>
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
 });
 
+builder.Services.AddAuthorizationCore(options =>
+{
+    options.AddPolicy("ContentEditor", policy =>
+        policy.RequireClaim("jobTitle",
+            "Editor", "editor"));
+});
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
