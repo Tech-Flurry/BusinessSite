@@ -63,7 +63,7 @@
                                         }
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group col-md-6">
                                     <label>Upload Main Image:</label>
                                     <InputFile OnChange="LoadFiles" class="file-loading form-select required" data-show-preview="false" />
                                 </div>
@@ -72,7 +72,7 @@
                                 <input type="text" id="jobs-application-botcheck" name="jobs-application-botcheck" value="" />
                             </div>
                             <div class="col-12">
-                                <button type="submit" name="jobs-application-submit" class="btn btn-secondary">Send Message</button>
+                                <button type="button" name="save-blog" class="btn btn-secondary">Save</button>
                             </div>
 
                         </form>
@@ -90,6 +90,7 @@
     public string Id { get; set; }
     private BlogModel _model = new BlogModel();
     private ElementReference form;
+    private List<(string, string)> base64Files = new List<(string, string)>();
 }
 
 @functions {
@@ -106,6 +107,8 @@
 
                 var buffer = new byte[imageFile.Size];
                 await resizedImageFile.OpenReadStream(51200000).ReadAsync(buffer);
+                base64Files.Clear();
+                base64Files.Add((fileName, Convert.ToBase64String(buffer)));
                 Firebase.UploadFile(fileName, Convert.ToBase64String(buffer), format);
             }
             catch (Exception ex)
