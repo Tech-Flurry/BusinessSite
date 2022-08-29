@@ -39,13 +39,13 @@
                             <li><a href="#"><i class="icon-user"></i> <_ContentLoader Model="_model" Content="x=>x.Author?.NickName" /></a></li>
                             <li><i class="icon-folder-open"></i> <a href="#"><_ContentLoader Model="_model" Content="x=>x.Category" /></a></li>
                             <li><a href="#"><i class="icon-comments"></i> <_ContentLoader Model="_model" Content="x=>x.Comments?.Count" /> Comments</a></li>
-                            <li>
-                                <a href="#">
-                                    <AuthorizeView Policy="ContentEditor">
-                                        <i class="icon-comments"></i> Edit
-                                    </AuthorizeView>
-                                </a>
-                            </li>
+                            <AuthorizeView Policy="ContentEditor">
+                                <li>
+                                    <a href="/Blogs/Blog/Edit/@_model?.Id">
+                                        <i class="icon-line-edit"></i> Edit
+                                    </a>
+                                </li>
+                            </AuthorizeView>
                         </ul>
                     </div><!-- .entry-meta end -->
                     <!-- Entry Image
@@ -212,6 +212,7 @@
         await base.OnInitializedAsync();
         _model = new BlogModel
             {
+                Id = Guid.NewGuid(),
                 Author = new AuthorModel
                 {
                     Bio = "Pakistani by birth, sober by face and childish by acts. Addicted to poetry and mad for traveling. Has great fondness for reading novels and loves the company of friends. I'm Sarim Chaudhary; having a handsome experience of writing blogs and articles on hot topics like politics, business, e-commerce, travelling, and DIY techniques to help elevate the living style and standards of my readers.",
@@ -294,5 +295,10 @@
         {
 
         }
+    }
+
+    private void OpenEdit()
+    {
+
     }
 }

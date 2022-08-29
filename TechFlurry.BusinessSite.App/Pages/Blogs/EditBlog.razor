@@ -1,0 +1,11 @@
+﻿@page "/Blogs/Blog/Edit/{Id}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Policy = "ContentEditor")]
+
+
+<h3>EditBlog - @Id</h3>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+}
