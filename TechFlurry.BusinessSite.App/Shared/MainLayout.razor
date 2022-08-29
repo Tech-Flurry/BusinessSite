@@ -2,8 +2,6 @@
 @using TechFlurry.BusinessSite.App.Interops
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
-@inject IFirebaseInterop _firebase
-@inject IWebAssemblyHostEnvironment HostEnv
 
 <_Header></_Header>
 
@@ -23,10 +21,6 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            if (!HostEnv.IsDevelopment())
-            {
-                await _firebase.InitFirebase();
-            }
         }
     }
 }

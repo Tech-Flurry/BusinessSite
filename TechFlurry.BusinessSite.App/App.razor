@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using TechFlurry.BusinessSite.App.Interops
 @inject NavigationManager Navigator
+@inject IFirebaseInterop Firebase
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
@@ -36,3 +38,14 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await Firebase.InitFirebase();
+        }
+    }
+}

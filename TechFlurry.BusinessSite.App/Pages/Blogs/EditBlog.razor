@@ -1,10 +1,12 @@
 ﻿@page "/Blogs/Blog/Edit/{Id}"
 @page "/Blogs/Blog/AddNew"
 @using Microsoft.AspNetCore.Authorization
+@using TechFlurry.BusinessSite.App.Interops
 @using TechFlurry.BusinessSite.Models
 @attribute [Authorize(Policy = "ContentEditor")]
 
 @inject ILogger<EditBlog> _logger
+@inject IFirebaseInterop Firebase
 
 <section id="page-title">
     <div class="container clearfix">
@@ -95,20 +97,20 @@
     {
         var maxAllowedFiles = 1;
         var format = "image/png";
-
         foreach (var imageFile in e.GetMultipleFiles(maxAllowedFiles))
         {
             try
             {
+                var resizedImageFile = await imageFile.RequestImageFileAsync(format, 1280, 1920);
+                var fileName = string.IsNullOrEmpty(_model?.Identifier) ? resizedImageFile.Name : _model?.Identifier + ".png";
+
                 var buffer = new byte[imageFile.Size];
-                await imageFile.OpenReadStream().ReadAsync(buffer);
-                var content =
-                    $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+                await resizedImageFile.OpenReadStream(51200000).ReadAsync(buffer);
+                Firebase.UploadFile(fileName, Convert.ToBase64String(buffer), format);
             }
             catch (Exception ex)
             {
-                _logger.LogError("File: {Filename} Error: {Error}",
-                    imageFile.Name, ex.Message);
+                _logger.LogError("File: {Filename} Error: {Error}", imageFile.Name, ex.Message);
             }
         }
     }
