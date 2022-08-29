@@ -30,9 +30,6 @@
                     ============================================= -->
                     <div class="entry-title">
                         <h2><_ContentLoader Model="_model" Content="x=>x.Heading" /></h2>
-                        <AuthorizeView Policy="ContentEditor">
-                            <button class="btn btn-icon"><i class="icon-line-edit" ></i></button>
-                        </AuthorizeView>
                     </div><!-- .entry-title end -->
                     <!-- Entry Meta
                     ============================================= -->
@@ -42,6 +39,13 @@
                             <li><a href="#"><i class="icon-user"></i> <_ContentLoader Model="_model" Content="x=>x.Author?.NickName" /></a></li>
                             <li><i class="icon-folder-open"></i> <a href="#"><_ContentLoader Model="_model" Content="x=>x.Category" /></a></li>
                             <li><a href="#"><i class="icon-comments"></i> <_ContentLoader Model="_model" Content="x=>x.Comments?.Count" /> Comments</a></li>
+                            <li>
+                                <a href="#">
+                                    <AuthorizeView Policy="ContentEditor">
+                                        <i class="icon-comments"></i> Edit
+                                    </AuthorizeView>
+                                </a>
+                            </li>
                         </ul>
                     </div><!-- .entry-meta end -->
                     <!-- Entry Image
