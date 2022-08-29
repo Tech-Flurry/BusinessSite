@@ -1,10 +1,14 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System.Buffers.Text;
 
 namespace TechFlurry.BusinessSite.App.Interops
 {
     public interface IFirebaseInterop
     {
         Task InitFirebase();
+        void PopulateImage( string fileName, ElementReference e );
+        void PopulateImage( string fileName, string selector );
         void UploadFile( string fileName, string base64, string contentType );
     }
 
@@ -36,10 +40,46 @@ namespace TechFlurry.BusinessSite.App.Interops
                 _logger.LogError($"Error in uploading the file. Error: {ex.Message}");
             }
         }
+
+        public async void PopulateImage( string fileName, ElementReference e )
+        {
+            try
+            {
+                var module = await Module;
+                await module.InvokeVoidAsync("populateImage", e, fileName, nameof(PopulateImageSuccess), nameof(PopulateImageError));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in populating the file. Error: {ex.Message}");
+            }
+        }
+        public async void PopulateImage( string fileName, string selector )
+        {
+            try
+            {
+                var module = await Module;
+                await module.InvokeVoidAsync("populateImage", selector, fileName, nameof(PopulateImageSuccess), nameof(PopulateImageError));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in populating the file. Error: {ex.Message}");
+            }
+        }
+
         [JSInvokable]
         public void UploadFileCompleted()
         {
             _logger.LogInformation("The file has been uploaded");
+        }
+        [JSInvokable]
+        public void PopulateImageSuccess( string fileName )
+        {
+            _logger.LogInformation($"Image (file: {fileName}) has been populated");
+        }
+        [JSInvokable]
+        public void PopulateImageError( string fileName )
+        {
+            _logger.LogError($"Error in populating image (file: {fileName})");
         }
     }
 }

@@ -6,6 +6,7 @@ import { getMessaging } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-
 import { getStorage } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-storage.js";
 import { ref } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-storage.js";
 import { uploadString } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-storage.js";
+import { getDownloadURL } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-storage.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 // https://firebase.google.com/docs/web/learn-more#libraries-cdn
@@ -60,4 +61,24 @@ export function uploadImage (filename, base64, contentType, completedCallback) {
             _dotnetReference.invokeMethodAsync(completedCallback);
         }
     });
+}
+
+export function populateImage (img, filename, successCallback, errorCallback) {
+    getDownloadURL(ref(storage, 'blogs-images/' + filename))
+        .then((url) => {
+            console.log(url);
+            $(img).attr("src", url);
+            //const img = document.getElementById('myimg');
+            //img.setAttribute('src', url);
+
+            if (successCallback) {
+                _dotnetReference.invokeMethodAsync(successCallback, filename);
+            }
+        })
+        .catch((error) => {
+            // Handle any errors
+            if (errorCallback) {
+                _dotnetReference.invokeMethodAsync(errorCallback, filename);
+            }
+        });
 }

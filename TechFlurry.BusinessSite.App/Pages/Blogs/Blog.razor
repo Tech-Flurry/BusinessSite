@@ -1,7 +1,10 @@
 ﻿@page "/Blogs/Blog/{Identifier}"
 
+@using TechFlurry.BusinessSite.App.Interops
 @using TechFlurry.BusinessSite.Models
 @using Microsoft.AspNetCore.Components.Authorization
+
+@inject IFirebaseInterop Firebase
 
 <section id="page-title">
     <div class="container clearfix">
@@ -52,7 +55,7 @@
                     <!-- Entry Image
                     ============================================= -->
                     <div class="entry-image bottommargin">
-                        <a href="#"><img src="@_model?.MainImage" alt="@_model?.ShortTitle"></a>
+                        <img id="main-img" src="#" alt="@_model?.ShortTitle">
                     </div><!-- .entry-image end -->
                     <!-- Entry Content
                     ============================================= -->
@@ -205,6 +208,7 @@
 
     private BlogModel _model;
     const string DATE_FORMAT = "MMMM dd, yyyy";
+    ElementReference mainImg;
 }
 
 @functions {
@@ -287,6 +291,7 @@
                     }
                 }
             };
+        Firebase.PopulateImage("pexels-sora-shimazaki-5668765.jpg", "#main-img");
     }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
