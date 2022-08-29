@@ -1,11 +1,115 @@
 ﻿@page "/Blogs/Blog/Edit/{Id}"
+@page "/Blogs/Blog/AddNew"
 @using Microsoft.AspNetCore.Authorization
+@using TechFlurry.BusinessSite.Models
 @attribute [Authorize(Policy = "ContentEditor")]
 
+@inject ILogger<EditBlog> _logger
 
-<h3>EditBlog - @Id</h3>
+<section id="page-title">
+    <div class="container clearfix">
+        <h1>Blog Single</h1>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Blog</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <_ContentLoader Model="_model" Content="x=>x.ShortTitle" />
+            </li>
+        </ol>
+    </div>
+</section>
+
+<section id="content">
+    <div class="content-wrap">
+        <div class="container clearfix">
+
+            <div class="form-widget">
+
+                <div class="form-result"></div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form class="row" @ref="form">
+                            <div class="form-process">
+                                <div class="css3-spinner">
+                                    <div class="css3-spinner-scaler"></div>
+                                </div>
+                            </div>
+                            <div class="col-12 form-group">
+                                <label>Main Heading:</label>
+                                <input type="text" @bind-value="_model.Heading" name="@nameof(_model.Heading)" id="@nameof(_model.Heading)" class="form-control required" placeholder="Enter Heading of the blog">
+                            </div>
+                            <div class="col-12 form-group">
+                                <label>Short Title:</label>
+                                <input type="text" @bind-value="_model.ShortTitle" name="@nameof(_model.ShortTitle)" id="@nameof(_model.ShortTitle)" class="form-control required" placeholder="Enter Short Title">
+                            </div>
+                            <div class="col-12 form-group">
+                                <label>Identifier:</label>
+                                <input type="text" @bind-value="_model.Identifier" name="@nameof(_model.Identifier)" id="@nameof(_model.Identifier)" class="form-control required" placeholder="Enter a Unique Identifier">
+                            </div>
+                            <div class="col-12 form-group">
+                                <label>Category:</label>
+                                <input type="text" @bind-value="_model.Category" name="@nameof(_model.Category)" id="@nameof(_model.Category)" class="form-control required" placeholder="Enter a Category">
+                            </div>
+                            <div class="col-12 form-group">
+                                <div class="col-md-6 form-group">
+                                    <label>Type:</label>
+                                    <select @bind="_model.BlogType" class="form-select required" name="@nameof(_model.BlogType)" id="@nameof(_model.BlogType)">
+                                        @foreach (var item in Enum.GetValues(typeof(BlogType)))
+                                        {
+                                            <option value="@item">@item</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Upload Main Image:</label>
+                                    <InputFile OnChange="LoadFiles" class="file-loading form-select required" data-show-preview="false" />
+                                </div>
+                            </div>
+                            <div class="col-12 d-none">
+                                <input type="text" id="jobs-application-botcheck" name="jobs-application-botcheck" value="" />
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" name="jobs-application-submit" class="btn btn-secondary">Send Message</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section>
 
 @code {
     [Parameter]
     public string Id { get; set; }
+    private BlogModel _model = new BlogModel();
+    private ElementReference form;
+}
+
+@functions {
+    private async void LoadFiles(InputFileChangeEventArgs e)
+    {
+        var maxAllowedFiles = 1;
+        var format = "image/png";
+
+        foreach (var imageFile in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                var buffer = new byte[imageFile.Size];
+                await imageFile.OpenReadStream().ReadAsync(buffer);
+                var content =
+                    $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("File: {Filename} Error: {Error}",
+                    imageFile.Name, ex.Message);
+            }
+        }
+    }
 }

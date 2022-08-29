@@ -1,4 +1,5 @@
 ﻿@page "/Blogs/Blog/{Identifier}"
+
 @using TechFlurry.BusinessSite.Models
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -9,7 +10,7 @@
             <li class="breadcrumb-item"><a href="#">Home</a></li>
             <li class="breadcrumb-item"><a href="#">Blog</a></li>
             <li class="breadcrumb-item active" aria-current="page">
-                <_ContentLoader Model="_model" Content="x=>x.ShortTitle" />
+                @_model?.ShortTitle
             </li>
         </ol>
     </div>
