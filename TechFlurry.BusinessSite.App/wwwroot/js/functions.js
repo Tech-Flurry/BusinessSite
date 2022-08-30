@@ -2287,3 +2287,11 @@ function formProcessing (form) {
 function formProcessed (form) {
     $(form).find('.form-process').fadeOut();
 }
+
+function initSummernote (textarea) {
+    $(textarea).summernote({
+        placeholder: 'Write Blog!!!',
+        tabsize: 2,
+        height: 100
+    });
+}

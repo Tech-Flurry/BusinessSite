@@ -7,6 +7,7 @@
 
 @inject ILogger<EditBlog> _logger
 @inject IFirebaseInterop Firebase
+@inject IJSRuntime JSRuntime
 
 <section id="page-title">
     <div class="container clearfix">
@@ -54,6 +55,10 @@
                                 <input type="text" @bind-value="_model.Category" name="@nameof(_model.Category)" id="@nameof(_model.Category)" class="form-control required" placeholder="Enter a Category">
                             </div>
                             <div class="col-12 form-group">
+                                <label>Tags:</label>
+                                <input type="text" @bind-value="tags" name="@nameof(tags)" id="@nameof(tags)" class="form-control required" placeholder="Enter comma (,) seperated tags">
+                            </div>
+                            <div class="col-12 form-group">
                                 <div class="col-md-6 form-group">
                                     <label>Type:</label>
                                     <select @bind="_model.BlogType" class="form-select required" name="@nameof(_model.BlogType)" id="@nameof(_model.BlogType)">
@@ -68,8 +73,8 @@
                                     <InputFile OnChange="LoadFiles" class="file-loading form-select required" data-show-preview="false" />
                                 </div>
                             </div>
-                            <div class="col-12 d-none">
-                                <input type="text" id="jobs-application-botcheck" name="jobs-application-botcheck" value="" />
+                            <div class="col-12">
+                                <textarea id="contentArea">@_model.Content</textarea>
                             </div>
                             <div class="col-12">
                                 <button type="button" name="save-blog" class="btn btn-secondary">Save</button>
@@ -91,9 +96,28 @@
     private BlogModel _model = new BlogModel();
     private ElementReference form;
     private List<(string, string)> base64Files = new List<(string, string)>();
+    private string tags;
 }
 
 @functions {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initSummernote", "#contentArea");
+        }
+    }
+
     private async void LoadFiles(InputFileChangeEventArgs e)
     {
         var maxAllowedFiles = 1;
